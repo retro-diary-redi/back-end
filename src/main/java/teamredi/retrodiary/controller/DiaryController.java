@@ -194,7 +194,7 @@ public class DiaryController {
      * 게시글 삭제
      * @param date 다이어리 작성 날짜
      * @param authentication 유저 정보
-     * @return
+     * @return 클라이언트로 응답
      */
     @DeleteMapping("/diaries/{date}/delete")
     public ResponseEntity<?> deleteDiary(@PathVariable String date, Authentication authentication) {
@@ -218,7 +218,8 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-//            diaryService.deleteDiary(id);
+            diaryService.deleteDiary(date, username);
+
             responseData.put("message", "Delete Diary Successful");
         } catch (Exception e) {
             e.printStackTrace();
