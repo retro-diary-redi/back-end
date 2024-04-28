@@ -39,8 +39,8 @@ public class DiaryController {
      * @return 클라이언트로 응답
      **/
 //    @Secured("USER")
-    @PostMapping("/diaries/write")
-    public ResponseEntity<?> writeDiary(@RequestBody DiaryWriteRequestDTO diaryWriteRequestDTO, Authentication authentication) {
+    @PostMapping("/diaries/{date}/write")
+    public ResponseEntity<?> writeDiary(@PathVariable String date, @RequestBody DiaryWriteRequestDTO diaryWriteRequestDTO, Authentication authentication) {
         log.info("diary write is working");
 
 
@@ -64,7 +64,7 @@ public class DiaryController {
 
         Map<String, Object> responseData = new HashMap<>();
         try {
-            diaryService.saveDiary(diaryWriteRequestDTO, username);
+            diaryService.saveDiary(diaryWriteRequestDTO, date, username);
             responseData.put("message", "Create Diary Successful.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +155,7 @@ public class DiaryController {
 
 
     /**
-     * 다이어리 업데이트(GET)
+     * 다이어리 업데이트(PUT)
      *
      * @param date 다이어리 작성 날짜
      * @param authentication 요청한 유저의 정보
