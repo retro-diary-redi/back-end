@@ -1,6 +1,7 @@
 package teamredi.retrodiary.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import teamredi.retrodiary.repository.member.MemberRepository;
 import teamredi.retrodiary.util.DiaryUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -104,6 +106,14 @@ public class DiaryService {
         } else {
             throw new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate);
         }
+    }
+
+    /**
+     * 해당 유저가 작성한 다이어리의 날짜 리스트 조회
+     * @param username 다이어리의 날짜를 조회하려는 유저 이름
+     **/
+    public List<String> getEachUserDiaryDateByUsername(String username) {
+        return diaryRepository.getEachUserDiaryDateByUsername(username);
     }
 
 

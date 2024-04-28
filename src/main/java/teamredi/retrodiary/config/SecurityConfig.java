@@ -88,7 +88,7 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc","/diaries/write", "/oauth2/**").permitAll()
+                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc","/diaries", "/oauth2/**").permitAll()
 
                         .anyRequest().authenticated())
 
