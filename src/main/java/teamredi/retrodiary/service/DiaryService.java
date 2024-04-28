@@ -29,7 +29,7 @@ public class DiaryService {
      * 다이어리 작성
      *
      * @param diaryWriteRequestDto 저장할 다이어리 정보
-     * @param username 유저 이름
+     * @param username 다이어리 작성 유저 이름
      **/
     @Transactional
     public void saveDiary(DiaryWriteRequestDTO diaryWriteRequestDto, String username) {
@@ -51,6 +51,7 @@ public class DiaryService {
      * 다이어리 조회(단건)
      *
      * @param date 다이어리 작성 날짜
+     * @param username 다이어리 작성 유저 이름
      * @return 해당하는 다이어리 정보
      **/
     public DiaryResponseDTO getDiaryByDateAndUsername(String date, String username) {
@@ -65,6 +66,8 @@ public class DiaryService {
      * 다이어리 수정
      *
      * @param date 다이어리
+     * @param username 다이어리 작성 유저 이름
+     *
      * @param diaryUpdateRequestDTO 다이어리 변경 데이터
      **/
     @Transactional
@@ -80,6 +83,27 @@ public class DiaryService {
                 diaryUpdateRequestDTO.getMood(),
                 diaryUpdateRequestDTO.getWeather(),
                 diaryUpdateRequestDTO.getContent());
+    }
+
+    /**
+     * 다이어리 삭제
+     *
+     * @param date 다이어리 작성 날짜
+     * @param username 다이어리 작성 유저 이름
+     *
+     **/
+    @Transactional
+    public void deleteDiary(String date, String username) {
+        LocalDate localDate = DiaryUtils.stringToLocalDate(date);
+        boolean isExistsDiary = diaryRepository.existsDiaryByDateAndUsername(
+                localDate, username);
+        if (isExistsDiary) {
+            Member member = memberRepository.findByUsername(username).orElseThrow(() ->
+                    new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
+            diaryRepository.deleteDiaryByDateAndMember(localDate, member);
+        } else {
+            throw new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate);
+        }
     }
 
 
