@@ -1,8 +1,11 @@
 package teamredi.retrodiary.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 public class DiaryUtils {
 
     public static String integerMoodToString(Integer integerMood) {
@@ -73,6 +76,7 @@ public class DiaryUtils {
     public static LocalDate stringToLocalDate(String stringDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+        log.info(LocalDate.parse(stringDate, formatter).toString());
         return LocalDate.parse(stringDate, formatter);
     }
 }

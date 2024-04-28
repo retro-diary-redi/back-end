@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import teamredi.retrodiary.dto.DiaryResponseDTO;
+import teamredi.retrodiary.entity.Diary;
 
 
 import java.time.LocalDate;
@@ -53,6 +54,7 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
                 )
                 .fetchOne());
     }
+
 
     @Override
     public boolean existsDiaryByDateAndUsername(LocalDate date, String username) {

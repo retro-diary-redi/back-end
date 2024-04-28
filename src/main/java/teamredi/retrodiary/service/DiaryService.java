@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamredi.retrodiary.dto.DiaryResponseDTO;
+import teamredi.retrodiary.dto.DiaryUpdateRequestDTO;
 import teamredi.retrodiary.dto.DiaryWriteRequestDTO;
 import teamredi.retrodiary.entity.Diary;
 import teamredi.retrodiary.entity.Member;
@@ -59,6 +60,29 @@ public class DiaryService {
                 .orElseThrow(() ->
                 new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
     }
+
+    /**
+     * 다이어리 수정
+     *
+     * @param date 다이어리
+     * @param diaryUpdateRequestDTO 다이어리 변경 데이터
+     **/
+    @Transactional
+    public void updateDiary(String date, String username, DiaryUpdateRequestDTO diaryUpdateRequestDTO) {
+        Member member = memberRepository.findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
+        LocalDate localDate = DiaryUtils.stringToLocalDate(date);
+        Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
+                new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
+
+        diary.updateDiary(
+                diaryUpdateRequestDTO.getTitle(),
+                diaryUpdateRequestDTO.getMood(),
+                diaryUpdateRequestDTO.getWeather(),
+                diaryUpdateRequestDTO.getContent());
+    }
+
+
 
 
 

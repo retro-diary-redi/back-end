@@ -1,31 +1,33 @@
 package teamredi.retrodiary.dto;
 
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@NoArgsConstructor
 @Getter
-public class DiaryResponseDTO {
+@Setter
+@NoArgsConstructor
+public class DiaryUpdateRequestDTO {
 
-
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private Integer mood;
 
+    @Column(nullable = false)
     private Integer weather;
 
+    @Column(nullable = false)
     private String content;
 
-    private String nickname;
-
-
     @Builder
-    public DiaryResponseDTO(String title, Integer mood, Integer weather, String content, String nickname) {
+    public DiaryUpdateRequestDTO(String title, Integer mood, Integer weather, String content) {
         this.title = title;
         this.mood = mood;
         this.weather = weather;
         this.content = content;
-        this.nickname = nickname;
     }
 }
