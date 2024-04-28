@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import teamredi.retrodiary.dto.JoinRequestDTO;
 import teamredi.retrodiary.dto.JoinResponseDTO;
-import teamredi.retrodiaryapp.service.MemberService;
+import teamredi.retrodiary.service.MemberService;
 
 import java.util.HashMap;
 import java.util.Map;

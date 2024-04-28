@@ -1,4 +1,4 @@
-package teamredi.retrodiaryapp.service;
+package teamredi.retrodiary.service;
 
 
 import lombok.RequiredArgsConstructor;
