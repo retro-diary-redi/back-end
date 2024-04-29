@@ -107,14 +107,12 @@ public class SecurityConfig {
                 );
 
 
-//         원본 코드
-
-
-        http
-                .oauth2Login(oauth2 -> oauth2
-//                        .loginPage("/auth/login")
-                        .userInfoEndpoint(userInfoEndpointConfig ->
-                                userInfoEndpointConfig.userService(customOAuth2UserService)));
+//        // oauth2 소셜 로그인 구현 코드
+//        http
+//                .oauth2Login(oauth2 -> oauth2
+////                        .loginPage("/auth/login")
+//                        .userInfoEndpoint(userInfoEndpointConfig ->
+//                                userInfoEndpointConfig.userService(customOAuth2UserService)));
 
 
         http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
@@ -130,7 +128,10 @@ public class SecurityConfig {
         http
                 .sessionManagement(auth -> auth
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                );
+                )
+                .rememberMe(auth -> auth
+                        .useSecureCookie(true) // HTTPS 환경에서만 쿠기전송
+                        .tokenValiditySeconds(86400));
 
         return http.build();
     }
