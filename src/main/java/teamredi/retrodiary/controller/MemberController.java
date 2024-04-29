@@ -48,7 +48,18 @@ public class MemberController {
     }
 
     @GetMapping("/auth/status")
-    public boolean isAuthenticated(Authentication authentication) {
-        return authentication != null && authentication.isAuthenticated();
+    public ResponseEntity<?> isAuthenticated(Authentication authentication) {
+        Map<String, Object> responseData = new HashMap<>();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            responseData.put("status", true);
+            responseData.put("message", "session is valid.");
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+
+        } else {
+            responseData.put("status", false);
+            responseData.put("message", "session has expired.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
     }
 }
