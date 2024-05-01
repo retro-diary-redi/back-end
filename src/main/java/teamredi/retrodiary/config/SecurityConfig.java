@@ -88,7 +88,7 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/status", "/diaries", "/oauth2/**").permitAll()
+                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries", "/oauth2/**").permitAll()
 
                         .anyRequest().authenticated())
 
@@ -114,6 +114,12 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpointConfig ->
                                 userInfoEndpointConfig.userService(customOAuth2UserService)));
 
+        http.logout(auth -> auth
+                .logoutUrl("/auth/logout")
+                .logoutSuccessUrl("/diaries")
+                .deleteCookies("JSESSIONID", "remember-me"));
+
+
 
         http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
                 .sessionManagement(auth -> auth
@@ -130,7 +136,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .rememberMe(auth -> auth
-                        .useSecureCookie(true) // HTTPS 환경에서만 쿠기전송
+                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
                         .tokenValiditySeconds(86400));
 
         return http.build();
