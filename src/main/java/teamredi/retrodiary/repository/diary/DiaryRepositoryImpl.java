@@ -1,14 +1,11 @@
 package teamredi.retrodiary.repository.diary;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import teamredi.retrodiary.dto.DiaryResponseDAO;
 import teamredi.retrodiary.dto.DiaryResponseDTO;
-import teamredi.retrodiary.entity.Diary;
+import teamredi.retrodiary.util.FileStorageUtil;
 
 
 import java.time.LocalDate;
@@ -17,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static teamredi.retrodiary.entity.QDiary.*;
+import static teamredi.retrodiary.entity.QDiaryImage.*;
 import static teamredi.retrodiary.entity.QMember.*;
 
 
@@ -28,21 +26,40 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
 
     @Override
     public Optional<DiaryResponseDTO> findDiaryByDateAndUsername(LocalDate date, String username) {
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(DiaryResponseDTO.class,
+        List<DiaryResponseDAO> content = jpaQueryFactory
+                .select(Projections.fields(DiaryResponseDAO.class,
                         diary.title,
                         diary.mood,
                         diary.weather,
                         diary.content,
-                        member.nickname
+                        member.nickname,
+                        diaryImage.savedFilename
                 ))
                 .from(diary)
-                .leftJoin(diary.member, member)
+                .join(diary.member, member)
+                .leftJoin(diary.diaryImages, diaryImage)
                 .where(
                         diary.date.eq(date)
-                        .and(member.username.eq(username))
+                                .and(member.username.eq(username))
                 )
-                .fetchOne());
+                .fetch();
+
+        DiaryResponseDAO diaryResponseDAO = content.get(0);
+
+        List<String> savedFilePaths = content.stream()
+                .map(DiaryResponseDAO::getSavedFilename)
+                .map(FileStorageUtil::getFullPath)
+                .toList();
+
+        return Optional.ofNullable(
+                DiaryResponseDTO.builder()
+                        .title(diaryResponseDAO.getTitle())
+                        .mood(diaryResponseDAO.getMood())
+                        .weather(diaryResponseDAO.getWeather())
+                        .content(diaryResponseDAO.getContent())
+                        .nickname(diaryResponseDAO.getNickname())
+                        .savedFilePaths(savedFilePaths)
+                        .build());
     }
 
     @Override

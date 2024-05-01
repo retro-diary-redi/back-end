@@ -1,15 +1,17 @@
 package teamredi.retrodiary.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Diary extends BaseTimeEntity{
 
@@ -35,28 +37,32 @@ public class Diary extends BaseTimeEntity{
     // 양방향
     // 하나의 멤버는 여러개의 다이어리를 작성 할 수 있다.
     @ManyToOne(fetch = FetchType.LAZY) // 연관관계의 주인이다.
-    @JoinColumn(name = "MEMBER_ID")
+    @JoinColumn(name = "member_id")
     private Member member;
 
+    // 양방향
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "diary")
+    private List<DiaryImage> diaryImages = new ArrayList<>();
 
     @Builder
-    public Diary(String title, Integer mood, Integer weather, String content, Member member, LocalDate date) {
+    public Diary(String title, Integer mood, Integer weather, String content, LocalDate date, Member member) {
+
         this.title = title;
         this.mood = mood;
         this.weather = weather;
         this.content = content;
-        this.assignMember(member);
         this.date = date;
+        this.assignMember(member);
     }
 
-    public static Diary createDiary(String title, Integer mood, Integer weather, String content, Member member, LocalDate date) {
+    public static Diary createDiary(String title, Integer mood, Integer weather, String content, LocalDate date, Member member) {
         return Diary.builder()
                 .title(title)
                 .mood(mood)
                 .weather(weather)
                 .content(content)
-                .member(member)
                 .date(date)
+                .member(member)
                 .build();
     }
 
@@ -72,6 +78,16 @@ public class Diary extends BaseTimeEntity{
             member.addDiary(this);
         }
     }
+
+    // 양방향 연관관계 편의 메서드
+    public void addDiaryImages(DiaryImage diaryImage) {
+        this.diaryImages.add(diaryImage);
+
+        if (diaryImage.getDiary() != this) {
+            diaryImage.assignDiary(this);
+        }
+    }
+
 
     public void updateDiary(String title, Integer mood, Integer weather, String content) {
         this.title = title;

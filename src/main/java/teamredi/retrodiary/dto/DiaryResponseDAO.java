@@ -4,11 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @NoArgsConstructor
 @Getter
-public class DiaryResponseDTO {
+public class DiaryResponseDAO {
 
 
     private String title;
@@ -21,16 +19,16 @@ public class DiaryResponseDTO {
 
     private String nickname;
 
-    private List<String> savedFilePaths;
+    private String savedFilename;
 
 
     @Builder
-    public DiaryResponseDTO(String title, Integer mood, Integer weather, String content, String nickname, List<String> savedFilePaths) {
+    public DiaryResponseDAO(String title, Integer mood, Integer weather, String content, String nickname, String savedFilename) {
         this.title = title;
         this.mood = mood;
         this.weather = weather;
         this.content = content;
         this.nickname = nickname;
-        this.savedFilePaths = savedFilePaths;
+        this.savedFilename = savedFilename;
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import teamredi.retrodiary.dto.DiaryResponseDTO;
 import teamredi.retrodiary.dto.DiaryUpdateRequestDTO;
 import teamredi.retrodiary.dto.DiaryWriteRequestDTO;
@@ -15,6 +16,7 @@ import teamredi.retrodiary.dto.oauth2.CustomOAuth2User;
 import teamredi.retrodiary.service.DiaryService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -35,12 +37,16 @@ public class DiaryController {
      * 다이어리 작성
      *
      * @param diaryWriteRequestDTO 작성할 다이어리 정보
+     * @param multipartFile 다이어리 업로드 이미지 정보
      * @param authentication 요청한 유저의 정보
      * @return 클라이언트로 응답
      **/
 //    @Secured("USER")
     @PostMapping("/diaries/{date}/write")
-    public ResponseEntity<?> writeDiary(@PathVariable String date, @RequestBody DiaryWriteRequestDTO diaryWriteRequestDTO, Authentication authentication) {
+    public ResponseEntity<?> writeDiary(@PathVariable String date,
+                                        @RequestPart(value = "diaryWriteRequestDTO") DiaryWriteRequestDTO diaryWriteRequestDTO,
+                                        @RequestPart(value = "images", required = false) List<MultipartFile> multipartFile,
+                                        Authentication authentication) {
         log.info("diary write is working");
 
 
@@ -64,7 +70,7 @@ public class DiaryController {
 
         Map<String, Object> responseData = new HashMap<>();
         try {
-            diaryService.saveDiary(diaryWriteRequestDTO, date, username);
+            diaryService.saveDiary(date, diaryWriteRequestDTO, multipartFile,  username);
             responseData.put("message", "Create Diary Successful.");
         } catch (Exception e) {
             e.printStackTrace();
