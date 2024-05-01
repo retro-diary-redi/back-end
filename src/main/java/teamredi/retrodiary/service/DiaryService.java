@@ -1,19 +1,23 @@
 package teamredi.retrodiary.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import teamredi.retrodiary.dto.DiaryResponseDTO;
 import teamredi.retrodiary.dto.DiaryUpdateRequestDTO;
 import teamredi.retrodiary.dto.DiaryWriteRequestDTO;
 import teamredi.retrodiary.entity.Diary;
+import teamredi.retrodiary.entity.DiaryImage;
 import teamredi.retrodiary.entity.Member;
 import teamredi.retrodiary.repository.diary.DiaryRepository;
 import teamredi.retrodiary.repository.member.MemberRepository;
 import teamredi.retrodiary.util.DiaryUtils;
+import teamredi.retrodiary.util.FileStorageUtil;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,7 +38,7 @@ public class DiaryService {
      * @param username 다이어리 작성 유저 이름
      **/
     @Transactional
-    public void saveDiary(DiaryWriteRequestDTO diaryWriteRequestDto, String date, String username) {
+    public void saveDiary(String date, DiaryWriteRequestDTO diaryWriteRequestDto, List<MultipartFile> images, String username) throws IOException {
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
 
@@ -43,8 +47,29 @@ public class DiaryService {
                 diaryWriteRequestDto.getMood(),
                 diaryWriteRequestDto.getWeather(),
                 diaryWriteRequestDto.getContent(),
-                member,
-                DiaryUtils.stringToLocalDate(date));
+                DiaryUtils.stringToLocalDate(date),
+                member
+                );
+
+        try {
+            if (images != null && !images.isEmpty()) {
+                for (MultipartFile image : images) {
+                    Pair<String, String> pair = FileStorageUtil.saveFile(image);
+
+                    String originalFilename = pair.getFirst();
+                    String savedFilename = pair.getSecond();
+
+                    DiaryImage diaryImage =
+                            DiaryImage.createDiaryImage(originalFilename, savedFilename, createDiary);
+                    createDiary.addDiaryImages(diaryImage);
+
+                }
+            }
+        } catch (IOException e) {
+            // 파일 저장 중 예외가 발생한 경우, 로그를 남기거나 에러 처리를 수행합니다.
+            System.err.println("Error saving images: " + e.getMessage());
+            throw e; // 예외를 다시 던져 컨트롤러나 상위 레이어에서 처리할 수 있게 합니다.
+        }
 
         diaryRepository.save(createDiary);
     }
