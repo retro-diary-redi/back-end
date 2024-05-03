@@ -12,7 +12,13 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                columnNames = {"date", "member_id"}
+        )
+})
 @Getter
+
 public class Diary extends BaseTimeEntity{
 
     @Id
@@ -41,7 +47,7 @@ public class Diary extends BaseTimeEntity{
     private Member member;
 
     // 양방향
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "diary")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "diary")
     private List<DiaryImage> diaryImages = new ArrayList<>();
 
     @Builder
