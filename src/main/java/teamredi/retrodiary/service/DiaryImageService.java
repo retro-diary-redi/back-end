@@ -33,7 +33,7 @@ public class DiaryImageService {
     private final DiaryImageRepository diaryImageRepository;
 
     @Transactional
-    public void deleteDiaryImage(String date, String username) throws IOException {
+    public void deleteDiaryImageFromLocalStorage(String date, String username) throws IOException {
 
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
@@ -43,32 +43,7 @@ public class DiaryImageService {
         Long diaryId = diary.getId();
         List<String> savedFilenameList = diaryImageRepository.getSavedFilenameListByDiaryId(diaryId);
 
-        log.info("size = " + savedFilenameList.size());
-        for (String s : savedFilenameList) {
-            log.info(s);
-        }
-        diaryImageRepository.deleteAllByDiary_Id(diaryId);
         FileStorageUtil.deleteFile(savedFilenameList);
     }
 
-
-    @Transactional
-    public void deleteDiaryImage2(String date, String username) throws IOException {
-
-        Member member = memberRepository.findByUsername(username).orElseThrow(() ->
-                new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
-        LocalDate localDate = DiaryUtils.stringToLocalDate(date);
-        Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
-                new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
-        Long diaryId = diary.getId();
-        List<String> savedFilenameList = diaryImageRepository.getSavedFilenameListByDiaryId(diaryId);
-
-        log.info("size = " + savedFilenameList.size());
-        for (String s : savedFilenameList) {
-            log.info(s);
-        }
-        FileStorageUtil.deleteFile(savedFilenameList);
-
-
-    }
 }
