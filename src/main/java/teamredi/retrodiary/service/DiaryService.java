@@ -13,6 +13,7 @@ import teamredi.retrodiary.entity.Diary;
 import teamredi.retrodiary.entity.DiaryImage;
 import teamredi.retrodiary.entity.Member;
 import teamredi.retrodiary.repository.diary.DiaryRepository;
+import teamredi.retrodiary.repository.image.DiaryImageRepository;
 import teamredi.retrodiary.repository.member.MemberRepository;
 import teamredi.retrodiary.util.DiaryUtils;
 import teamredi.retrodiary.util.FileStorageUtil;
@@ -30,6 +31,8 @@ public class DiaryService {
     private final MemberRepository memberRepository;
 
     private final DiaryRepository diaryRepository;
+
+
 
     /**
      * 다이어리 작성
@@ -98,12 +101,32 @@ public class DiaryService {
      * @param diaryUpdateRequestDTO 다이어리 변경 데이터
      **/
     @Transactional
-    public void updateDiary(String date, String username, DiaryUpdateRequestDTO diaryUpdateRequestDTO) {
+    public void updateDiary(String date, DiaryUpdateRequestDTO diaryUpdateRequestDTO, List<MultipartFile> images, String username) throws IOException {
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
         LocalDate localDate = DiaryUtils.stringToLocalDate(date);
         Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
                 new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
+
+        try {
+            if (images != null && !images.isEmpty()) {
+                for (MultipartFile image : images) {
+                    Pair<String, String> pair = FileStorageUtil.saveFile(image);
+
+                    String originalFilename = pair.getFirst();
+                    String savedFilename = pair.getSecond();
+
+                    DiaryImage diaryImage =
+                            DiaryImage.createDiaryImage(originalFilename, savedFilename, diary);
+                    diary.addDiaryImages(diaryImage);
+
+                }
+            }
+        } catch (IOException e) {
+            // 파일 저장 중 예외가 발생한 경우, 로그를 남기거나 에러 처리를 수행합니다.
+            System.err.println("Error updating images: " + e.getMessage());
+            throw e; // 예외를 다시 던져 컨트롤러나 상위 레이어에서 처리할 수 있게 합니다.
+        }
 
         diary.updateDiary(
                 diaryUpdateRequestDTO.getTitle(),

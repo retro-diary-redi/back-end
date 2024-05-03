@@ -4,10 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -24,22 +25,20 @@ public class FileStorageUtil {
 
     public static Pair<String, String> saveFile(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
+
         // 원본 파일명 -> 서버에 저장된 파일명 (중복 X)
         // 파일명이 중복되지 않도록 UUID로 설정 + 확장자 유지
         assert originalFilename != null;
         String savedFilename = UUID.randomUUID() + "." + extractExt(originalFilename);
 
-        Path path = Paths.get(LOCAL_STORE_DIR + savedFilename);
-        log.info(path.toString());
+       // 디렉토리가 없으면 생성
+        new File(FILE_DIR).mkdirs();
 
-        // 업로드 디렉토리가 존재하지 않으면 생성합니다.
-        Files.createDirectories(path.getParent());
+        File image = new File(FILE_DIR, savedFilename);
 
-        // 파일 저장
-//        file.transferTo(new File(getFullPath(savedFilename)));
+        // 파일을 디렉토리에 저장
+        file.transferTo(image);
 
-        // 파일을 로컬에 저장합니다.
-        Files.write(path, file.getBytes());
 
         // 저장된 파일의 경로를 반환합니다.
         return Pair.of(originalFilename, savedFilename);
@@ -49,6 +48,13 @@ public class FileStorageUtil {
     private static  String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
+    }
+
+    // 로컬 저장소에서 해당 파일 삭제
+    public static void deleteFile(List<String> savedFilenameList) throws IOException {
+        for (String savedFilename : savedFilenameList) {
+            Files.deleteIfExists(Paths.get(FILE_DIR + savedFilename));
+        }
     }
 
 

@@ -75,7 +75,6 @@ public class DiaryUtils {
 
     public static LocalDate stringToLocalDate(String stringDate) {DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        log.info(LocalDate.parse(stringDate, formatter).toString());
         return LocalDate.parse(stringDate, formatter);
     }
 }

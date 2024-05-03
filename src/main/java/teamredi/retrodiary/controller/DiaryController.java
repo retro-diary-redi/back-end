@@ -13,6 +13,7 @@ import teamredi.retrodiary.dto.DiaryResponseDTO;
 import teamredi.retrodiary.dto.DiaryUpdateRequestDTO;
 import teamredi.retrodiary.dto.DiaryWriteRequestDTO;
 import teamredi.retrodiary.dto.oauth2.CustomOAuth2User;
+import teamredi.retrodiary.service.DiaryImageService;
 import teamredi.retrodiary.service.DiaryService;
 
 import java.util.HashMap;
@@ -25,6 +26,8 @@ import java.util.Map;
 public class DiaryController {
 
     private final DiaryService diaryService;
+
+    private final DiaryImageService diaryImageService;
 
 //    @Secured("USER")
     @GetMapping("/diaries/write")
@@ -169,7 +172,10 @@ public class DiaryController {
      **/
 //    @Secured("USER")
     @PutMapping("/diaries/{date}/update")
-    public ResponseEntity<?> updateDiary(@PathVariable String date, @RequestBody DiaryUpdateRequestDTO requestDTO, Authentication authentication) {
+    public ResponseEntity<?> updateDiary(@PathVariable String date,
+                                         @RequestPart(value = "diaryUpdateRequestDTO") DiaryUpdateRequestDTO diaryUpdateRequestDTO,
+                                         @RequestPart(value = "images", required = false) List<MultipartFile> multipartFile,
+                                         Authentication authentication) {
         String username = "";
         if (authentication instanceof OAuth2AuthenticationToken) {
             // OAuth2.0 사용자
@@ -185,7 +191,9 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-            diaryService.updateDiary(date, username, requestDTO);
+            diaryImageService.deleteDiaryImage(date, username);
+//            diaryImageService.deleteDiayImage(date, username);
+            diaryService.updateDiary(date, diaryUpdateRequestDTO, multipartFile, username);
             responseData.put("message", "Update Diary Successful");
         } catch (Exception e) {
             e.printStackTrace();
@@ -224,6 +232,7 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
+            diaryImageService.deleteDiaryImage2(date, username);
             diaryService.deleteDiary(date, username);
 
             responseData.put("message", "Delete Diary Successful");
