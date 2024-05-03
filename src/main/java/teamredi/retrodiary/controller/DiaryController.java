@@ -191,8 +191,7 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-            diaryImageService.deleteDiaryImage(date, username);
-//            diaryImageService.deleteDiayImage(date, username);
+            diaryImageService.deleteDiaryImageFromLocalStorage(date, username);
             diaryService.updateDiary(date, diaryUpdateRequestDTO, multipartFile, username);
             responseData.put("message", "Update Diary Successful");
         } catch (Exception e) {
@@ -232,7 +231,7 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-            diaryImageService.deleteDiaryImage2(date, username);
+            diaryImageService.deleteDiaryImageFromLocalStorage(date, username);
             diaryService.deleteDiary(date, username);
 
             responseData.put("message", "Delete Diary Successful");

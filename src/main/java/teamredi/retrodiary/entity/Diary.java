@@ -95,6 +95,13 @@ public class Diary extends BaseTimeEntity{
     }
 
 
+    public void assignNull() {
+        if (!this.diaryImages.isEmpty()) {
+            this.diaryImages = new ArrayList<>();
+        }
+    }
+
+
     public void updateDiary(String title, Integer mood, Integer weather, String content) {
         this.title = title;
         this.mood = mood;
