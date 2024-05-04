@@ -46,9 +46,8 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
 
         DiaryResponseDAO diaryResponseDAO = content.get(0);
 
-        List<String> savedFilePaths = content.stream()
+        List<String> savedFilenames = content.stream()
                 .map(DiaryResponseDAO::getSavedFilename)
-                .map(FileStorageUtil::getFullPath)
                 .toList();
 
         return Optional.ofNullable(
@@ -58,7 +57,7 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
                         .weather(diaryResponseDAO.getWeather())
                         .content(diaryResponseDAO.getContent())
                         .nickname(diaryResponseDAO.getNickname())
-                        .savedFilePaths(savedFilePaths)
+                        .savedFilenames(savedFilenames)
                         .build());
     }
 

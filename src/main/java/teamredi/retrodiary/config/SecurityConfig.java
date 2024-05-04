@@ -1,6 +1,7 @@
 package teamredi.retrodiary.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -88,8 +90,8 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                        .requestMatchers("/diaries/image/**").permitAll()
                         .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries", "/oauth2/**").permitAll()
-
                         .anyRequest().authenticated())
 
                 // 추가 코드
@@ -105,7 +107,6 @@ public class SecurityConfig {
                                                 HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                         )
                 );
-
 
         // oauth2 소셜 로그인 구현 코드
         http
@@ -163,5 +164,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 }
