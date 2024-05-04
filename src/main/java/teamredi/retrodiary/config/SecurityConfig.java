@@ -1,9 +1,12 @@
 package teamredi.retrodiary.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -32,7 +35,9 @@ import teamredi.retrodiary.service.CustomOAuth2UserService;
 
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -117,7 +122,15 @@ public class SecurityConfig {
 
         http.logout(auth -> auth
                 .logoutUrl("/auth/logout")
-                .logoutSuccessUrl("/diaries")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    Map<String, Object> responseData = new HashMap<>();
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setCharacterEncoding("UTF-8");
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    responseData.put("message", "성공적으로 로그아웃 되었습니다.");
+                    objectMapper.writeValue(response.getWriter(), responseData);
+                })
                 .deleteCookies("JSESSIONID", "remember-me"));
 
 
