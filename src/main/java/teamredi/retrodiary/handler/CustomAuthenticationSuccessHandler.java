@@ -34,12 +34,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        
         ResponseLoginDTO responseLoginDTO =
                 ResponseLoginDTO.builder()
                                 .username(user.getUsername())
                                 .build();
         responseData.put("userInfo", responseLoginDTO.getUsername());
-        responseData.put("message", "Authentication Successful.");
+        responseData.put("message", "로그인에 성공하였습니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);
     }

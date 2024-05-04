@@ -32,7 +32,7 @@ public class HomeController {
         if (authentication == null) {
             responseData.put("counts", 0);
             responseData.put("diaryDateList", diaryDateList);
-            responseData.put("message", "Anonymous User Request");
+            responseData.put("message", "로그인되지 않은 사용자의 요청입니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
 
             // 그외 사용자
@@ -52,7 +52,7 @@ public class HomeController {
             diaryDateList = diaryService.getEachUserDiaryDateByUsername(username);
             responseData.put("diaryDateList", diaryDateList);
             responseData.put("counts", diaryDateList.size());
-            responseData.put("message", "Find DiaryDateList Success");
+            responseData.put("message", "로그인된 사용자의 요청입니다.");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         }

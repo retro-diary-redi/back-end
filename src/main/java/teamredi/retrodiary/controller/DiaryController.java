@@ -74,10 +74,10 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
         try {
             diaryService.saveDiary(date, diaryWriteRequestDTO, multipartFile,  username);
-            responseData.put("message", "Create Diary Successful.");
+            responseData.put("message", "일기를 성공적으로 작성했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            responseData.put("message", "Create Diary Fail.");
+            responseData.put("message", "일기 형식이 올바르지 않습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
@@ -113,10 +113,10 @@ public class DiaryController {
         try {
             DiaryResponseDTO diary = diaryService.getDiaryByDateAndUsername(date, username);
             responseData.put("diaryInfo", diary);
-            responseData.put("message", "Find Diary Successful");
+            responseData.put("message", "일기를 성공적으로 찾았습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            responseData.put("message", "Find Diary Fail.");
+            responseData.put("message", "일기를 찾지 못하였습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
@@ -193,10 +193,10 @@ public class DiaryController {
         try {
             diaryImageService.deleteDiaryImageFromDBAndLocalStorage(date, username);
             diaryService.updateDiary(date, diaryUpdateRequestDTO, multipartFile, username);
-            responseData.put("message", "Update Diary Successful");
+            responseData.put("message", "일기를 성공적으로 업데이트 했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            responseData.put("message", "Update Diary Fail.");
+            responseData.put("message", "일기 형식이 올바르지 않습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
@@ -234,10 +234,10 @@ public class DiaryController {
             diaryImageService.deleteDiaryImageFromLocalStorage(date, username);
             diaryService.deleteDiary(date, username);
 
-            responseData.put("message", "Delete Diary Successful");
+            responseData.put("message", "다이어리를 성공적으로 삭제 했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            responseData.put("message", "Delete Diary Fail.");
+            responseData.put("message", "다이어리 삭제에 실패했습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 

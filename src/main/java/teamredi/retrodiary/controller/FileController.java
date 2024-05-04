@@ -16,6 +16,8 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -36,8 +38,15 @@ public class FileController {
         Path path = Paths.get(FileStorageUtil.LOCAL_STORE_DIR, filename);
 
         // 파일의 존재 및 읽기 가능성을 확인합니다
-        if (!Files.exists(path) || !Files.isReadable(path)) {
-            throw new RuntimeException("File not found or unreadable: " + filename);
+        try {
+            if (!Files.exists(path) || !Files.isReadable(path)) {
+                throw new RuntimeException("File not found or unreadable: " + filename);
+            }
+        }
+        catch(Exception e){
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", "파일에대한 정보를 찾을수 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
         // MIME 타입을 확인하고, 없을 경우 기본값을 설정
