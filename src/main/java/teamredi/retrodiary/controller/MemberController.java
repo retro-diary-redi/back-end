@@ -36,12 +36,12 @@ public class MemberController {
                     .build();
 
             responseData.put("userInfo", joinResponseDto);
-            responseData.put("message", "Registration Successful.");
+            responseData.put("message", "회원가입이 완료 되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             responseData.put("result", "error");
-            responseData.put("message", "Registration Fail.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+            responseData.put("message", "이미 등록된 이메일 주소입니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
@@ -53,12 +53,12 @@ public class MemberController {
 
         if (authentication != null && authentication.isAuthenticated()) {
             responseData.put("status", true);
-            responseData.put("message", "session is valid.");
+            responseData.put("message", "세션이 유효합니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
 
         } else {
             responseData.put("status", false);
-            responseData.put("message", "session has expired.");
+            responseData.put("message", "세션이 만료되었습니다.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
         }
     }

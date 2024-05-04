@@ -19,18 +19,19 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    public Long registerMember(JoinRequestDTO requestDto) {
+    public void registerMember(JoinRequestDTO requestDto) throws Exception {
         boolean isAlreadyUser = memberRepository.existsByUsername(requestDto.getUsername());
 
         if (isAlreadyUser) {
-            return 0L;
+            throw new Exception("동일한 아이디가 이미 존재합니다.");
         }
 
-        return memberRepository.save(Member.createMember(
+        memberRepository.save(Member.createMember(
                 requestDto.getUsername(),
                 bCryptPasswordEncoder.encode(requestDto.getPassword()),
                 requestDto.getNickname(),
                 requestDto.getEmail(),
-                Role.USER)).getId();
+                Role.USER));
+
     }
 }
