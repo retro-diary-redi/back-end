@@ -108,8 +108,7 @@ public class DiaryService {
         Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
                 new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
 
-        // 해당 다이어리에 엔티티와 연관관계가 있는 자식 다이어리 이미지 엔티티 DB에서 삭제
-        diaryImageRepository.deleteAllByDiary(diary);
+
 
         try {
             if (images != null && !images.isEmpty()) {

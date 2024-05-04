@@ -33,6 +33,23 @@ public class DiaryImageService {
     private final DiaryImageRepository diaryImageRepository;
 
     @Transactional
+    public void deleteDiaryImageFromDBAndLocalStorage(String date, String username) throws IOException {
+
+        Member member = memberRepository.findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
+        LocalDate localDate = DiaryUtils.stringToLocalDate(date);
+        Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
+                new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
+        Long diaryId = diary.getId();
+        List<String> savedFilenameList = diaryImageRepository.getSavedFilenameListByDiaryId(diaryId);
+
+        // 해당 다이어리에 엔티티와 연관관계가 있는 자식 다이어리 이미지 엔티티 DB에서 삭제
+        diaryImageRepository.deleteAllByDiary(diary);
+
+        FileStorageUtil.deleteFile(savedFilenameList);
+    }
+
+    @Transactional
     public void deleteDiaryImageFromLocalStorage(String date, String username) throws IOException {
 
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
@@ -42,6 +59,9 @@ public class DiaryImageService {
                 new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
         Long diaryId = diary.getId();
         List<String> savedFilenameList = diaryImageRepository.getSavedFilenameListByDiaryId(diaryId);
+
+        // 해당 다이어리에 엔티티와 연관관계가 있는 자식 다이어리 이미지 엔티티 DB에서 삭제
+        diaryImageRepository.deleteAllByDiary(diary);
 
         FileStorageUtil.deleteFile(savedFilenameList);
     }
