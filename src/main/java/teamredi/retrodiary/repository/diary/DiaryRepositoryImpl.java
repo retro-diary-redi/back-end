@@ -1,5 +1,6 @@
 package teamredi.retrodiary.repository.diary;
 
+import ch.qos.logback.core.rolling.helper.FileStoreUtil;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +47,9 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
 
         DiaryResponseDAO diaryResponseDAO = content.get(0);
 
-        List<String> savedFilenames = content.stream()
+        List<String> savedFilePaths = content.stream()
                 .map(DiaryResponseDAO::getSavedFilename)
+                .map(FileStorageUtil::getLocalStoreDir)
                 .toList();
 
         return Optional.ofNullable(
@@ -57,7 +59,7 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
                         .weather(diaryResponseDAO.getWeather())
                         .content(diaryResponseDAO.getContent())
                         .nickname(diaryResponseDAO.getNickname())
-                        .savedFilenames(savedFilenames)
+                        .savedFilePaths(savedFilePaths)
                         .build());
     }
 
