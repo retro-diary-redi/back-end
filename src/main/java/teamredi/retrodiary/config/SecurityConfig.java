@@ -96,7 +96,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/diaries/image/**").permitAll()
-                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries", "/oauth2/**").permitAll()
+                        .requestMatchers("https://nid.naver.com/oauth2.0/authorize/**").permitAll()
+                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated())
 
                 // 추가 코드
