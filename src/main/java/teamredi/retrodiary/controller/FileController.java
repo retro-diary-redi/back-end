@@ -35,7 +35,7 @@ public class FileController {
         savedFilename = savedFilename.replaceAll("\\+", "%20");
 
         // 파일 경로를 생성
-        Path path = Paths.get(FileStorageUtil.LOCAL_STORE_DIR, filename);
+        Path path = Paths.get(FileStorageUtil.LOCAL_STORE_FULL_DIR, filename);
 
         // 파일의 존재 및 읽기 가능성을 확인합니다
         try {

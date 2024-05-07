@@ -21,16 +21,16 @@ public class DiaryResponseDTO {
 
     private String nickname;
 
-    private List<String> savedFilenames;
+    private List<String> savedFilePaths;
 
 
     @Builder
-    public DiaryResponseDTO(String title, Integer mood, Integer weather, String content, String nickname, List<String> savedFilenames) {
+    public DiaryResponseDTO(String title, Integer mood, Integer weather, String content, String nickname, List<String> savedFilePaths) {
         this.title = title;
         this.mood = mood;
         this.weather = weather;
         this.content = content;
         this.nickname = nickname;
-        this.savedFilenames = savedFilenames;
+        this.savedFilePaths = savedFilePaths;
     }
 }
