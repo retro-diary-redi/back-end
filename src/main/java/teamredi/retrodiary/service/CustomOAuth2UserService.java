@@ -73,7 +73,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             memberRepository.save(member);
 
-
             // 신규 로그인 회원이 아니라면 현재 로그인한 유저 정보를 바탕으로 DB에 업데이트
         } else {
 
