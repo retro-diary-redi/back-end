@@ -35,5 +35,4 @@ public class NaverUserInfo implements OAuth2UserInfo {
     public String getUsername() {
         return getProvider() + " " + getProviderId();
     }
-
 }

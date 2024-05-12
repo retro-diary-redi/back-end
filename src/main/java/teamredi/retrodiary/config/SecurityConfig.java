@@ -31,6 +31,8 @@ import teamredi.retrodiary.handler.CustomAccessDeniedHandler;
 import teamredi.retrodiary.handler.CustomAuthenticationFailureHandler;
 import teamredi.retrodiary.handler.CustomAuthenticationSuccessHandler;
 import teamredi.retrodiary.handler.CustomLoginAuthenticationEntryPoint;
+import teamredi.retrodiary.handler.OAuth2AuthenticationFailureHandler;
+import teamredi.retrodiary.handler.OAuth2AuthenticationSuccessHandler;
 import teamredi.retrodiary.service.CustomOAuth2UserService;
 
 
@@ -46,12 +48,15 @@ import java.util.Map;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomLoginAuthenticationEntryPoint authenticationEntryPoint;
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -76,14 +81,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-//
-//                );
-//
-//
 //        http
 //                .logout(auth -> auth.logoutUrl("/logout")
 //                        .logoutSuccessUrl("/"));
-
 
         // 새로추가
         http
@@ -97,8 +97,7 @@ public class SecurityConfig {
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/diaries/image/**").permitAll()
 //                        .requestMatchers("/uploadFiles/**").permitAll()
-                        .requestMatchers("https://nid.naver.com/oauth2.0/authorize/**").permitAll()
-                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries","/oauth2/authorization/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated())
 
                 // 추가 코드
@@ -119,8 +118,15 @@ public class SecurityConfig {
         http
                 .oauth2Login(oauth2 -> oauth2
 //                        .loginPage("/auth/login")
+                        .authorizationEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/oauth2/authorization"))
+                        .redirectionEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/login/oauth2/code/**"))
                         .userInfoEndpoint(userInfoEndpointConfig ->
-                                userInfoEndpointConfig.userService(customOAuth2UserService)));
+                                userInfoEndpointConfig
+                                        .userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler));
 
         http.logout(auth -> auth
                 .logoutUrl("/auth/logout")
