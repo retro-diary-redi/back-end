@@ -9,6 +9,7 @@ import teamredi.retrodiary.util.FileStorageUtil;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,10 +47,14 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
 
         DiaryResponseDAO diaryResponseDAO = content.get(0);
 
-        List<String> savedFilePaths = content.stream()
-                .map(DiaryResponseDAO::getSavedFilename)
-                .map(FileStorageUtil::getLocalStoreDir)
-                .toList();
+        List<String> savedFilePaths = new ArrayList<>();
+
+        if (diaryResponseDAO.getSavedFilename() != null) {
+            savedFilePaths = content.stream()
+                    .map(DiaryResponseDAO::getSavedFilename)
+                    .map(FileStorageUtil::getLocalStoreDir)
+                    .toList();
+        }
 
         return Optional.ofNullable(
                 DiaryResponseDTO.builder()

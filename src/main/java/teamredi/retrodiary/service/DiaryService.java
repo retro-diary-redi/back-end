@@ -1,6 +1,8 @@
 package teamredi.retrodiary.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.NoSuchElementException;
 @Transactional(readOnly = true)
 public class DiaryService {
 
+    private static final Logger log = LoggerFactory.getLogger(DiaryService.class);
     private final MemberRepository memberRepository;
 
     private final DiaryRepository diaryRepository;
@@ -42,6 +45,7 @@ public class DiaryService {
      **/
     @Transactional
     public void saveDiary(String date, DiaryWriteRequestDTO diaryWriteRequestDto, List<MultipartFile> images, String username) throws IOException {
+        log.info("size = " + images.size());
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
 
@@ -55,7 +59,7 @@ public class DiaryService {
                 );
 
         try {
-            if (images != null && !images.isEmpty()) {
+            if (!images.isEmpty() && !images.get(0).isEmpty()) {
                 for (MultipartFile image : images) {
                     Pair<String, String> pair = FileStorageUtil.saveFile(image);
 
