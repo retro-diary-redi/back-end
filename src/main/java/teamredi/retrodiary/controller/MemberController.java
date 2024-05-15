@@ -40,7 +40,7 @@ public class MemberController {
         } catch (Exception e) {
             e.printStackTrace();
             responseData.put("result", "error");
-            responseData.put("message", "이미 등록된 이메일 주소입니다.");
+            responseData.put("message", "이미 등록된 아이디 입니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
