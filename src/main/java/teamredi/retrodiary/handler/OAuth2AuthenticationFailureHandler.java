@@ -11,6 +11,8 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,7 @@ import java.util.Map;
 public class OAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -64,6 +67,8 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
         responseData.put("result", "error");
         responseData.put("message", errorMessage);
 
+
+        redirectStrategy.sendRedirect(request, response, "http://localhost:3000/login");
         objectMapper.writeValue(response.getWriter(), responseData);
     }
 

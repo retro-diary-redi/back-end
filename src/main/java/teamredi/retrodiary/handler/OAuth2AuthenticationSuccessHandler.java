@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import teamredi.retrodiary.dto.ResponseLoginDTO;
@@ -23,12 +25,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final ObjectMapper objectMapper = new ObjectMapper();
     Map<String, Object> responseData = new HashMap<>();
 
+    RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 success handler is working");
         CustomOAuth2User user =  (CustomOAuth2User) authentication.getPrincipal();
         log.info("login user name : " + user.getUsername());
-
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -41,6 +43,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         responseData.put("userInfo", responseLoginDTO);
         responseData.put("message", "로그인에 성공하였습니다.");
 
+        redirectStrategy.sendRedirect(request, response , "http://localhost:3000/");
         objectMapper.writeValue(response.getWriter(), responseData);
     }
 }
