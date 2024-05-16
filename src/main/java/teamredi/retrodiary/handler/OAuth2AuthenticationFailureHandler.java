@@ -68,7 +68,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
         responseData.put("message", errorMessage);
 
 
-        redirectStrategy.sendRedirect(request, response, "http://localhost:3000/login");
+        redirectStrategy.sendRedirect(request, response, "http://localhost:3000/login/oauth/callback?message=fail");
         objectMapper.writeValue(response.getWriter(), responseData);
     }
 

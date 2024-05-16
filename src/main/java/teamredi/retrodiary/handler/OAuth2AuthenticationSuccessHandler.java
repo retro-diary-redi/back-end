@@ -43,7 +43,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         responseData.put("userInfo", responseLoginDTO);
         responseData.put("message", "로그인에 성공하였습니다.");
 
-        redirectStrategy.sendRedirect(request, response , "http://localhost:3000/");
+        redirectStrategy.sendRedirect(request, response , "http://localhost:3000/login/oauth/callback?message=success");
         objectMapper.writeValue(response.getWriter(), responseData);
     }
 }
