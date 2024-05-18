@@ -24,7 +24,6 @@ public class HomeController {
 
     private final DiaryService diaryService;
 
-    //    @Secured("USER")
     @GetMapping("/diaries")
     public ResponseEntity<?> homePage(Authentication authentication) {
         Map<String, Object> responseData = new HashMap<>();

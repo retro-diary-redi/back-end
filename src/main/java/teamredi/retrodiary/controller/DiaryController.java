@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -44,7 +47,8 @@ public class DiaryController {
      * @param authentication 요청한 유저의 정보
      * @return 클라이언트로 응답
      **/
-//    @Secured("USER")
+    @Secured("USER")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/diaries/{date}/write")
     public ResponseEntity<?> writeDiary(@PathVariable String date,
                                         @RequestPart(value = "diaryWriteRequestDTO") DiaryWriteRequestDTO diaryWriteRequestDTO,
@@ -93,7 +97,8 @@ public class DiaryController {
      * @param authentication 요청한 유저의 정보
      * @return 클라이언트로 응답
      **/
-    //    @Secured("USER")
+    @Secured("USER")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/diaries/{date}")
     public ResponseEntity<?> findDiary(@PathVariable String date, Authentication authentication) {
         String username = "";
@@ -131,7 +136,8 @@ public class DiaryController {
      * @param authentication 요청한 유저의 정보
      * @return 클라이언트로 응답
      **/
-//    @Secured("USER")
+    @Secured("USER")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/diaries/{date}/update")
     public ResponseEntity<?> updateDiary(@PathVariable String date, Authentication authentication) {
         String username = "";
@@ -170,7 +176,9 @@ public class DiaryController {
      * @param authentication 요청한 유저의 정보
      * @return 클라이언트로 응답
      **/
-//    @Secured("USER")
+
+    @Secured("USER")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/diaries/{date}/update")
     public ResponseEntity<?> updateDiary(@PathVariable String date,
                                          @RequestPart(value = "diaryUpdateRequestDTO") DiaryUpdateRequestDTO diaryUpdateRequestDTO,
@@ -209,6 +217,8 @@ public class DiaryController {
      * @param authentication 유저 정보
      * @return 클라이언트로 응답
      */
+    @Secured("USER")
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/diaries/{date}/delete")
     public ResponseEntity<?> deleteDiary(@PathVariable String date, Authentication authentication) {
 //        BoardResponseDTO result = boardService.boardDetail(id);
