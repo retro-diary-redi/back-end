@@ -95,9 +95,7 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/diaries/image/**").permitAll()
-//                        .requestMatchers("/uploadFiles/**").permitAll()
-                        .requestMatchers("/", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/diaries","/oauth2/authorization/**", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/diaries", "/auth/login", "/auth/loginProc", "/auth/register", "/auth/registerProc", "/auth/logout", "/auth/status", "/oauth2/authorization/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated())
 
                 // 추가 코드
@@ -140,7 +138,6 @@ public class SecurityConfig {
                     objectMapper.writeValue(response.getWriter(), responseData);
                 })
                 .deleteCookies("JSESSIONID", "remember-me"));
-
 
 
         http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
