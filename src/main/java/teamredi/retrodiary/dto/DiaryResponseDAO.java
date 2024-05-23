@@ -19,16 +19,16 @@ public class DiaryResponseDAO {
 
     private String nickname;
 
-    private String savedFilename;
+    private String awsS3SavedFileURL;
 
 
     @Builder
-    public DiaryResponseDAO(String title, Integer mood, Integer weather, String content, String nickname, String savedFilename) {
+    public DiaryResponseDAO(String title, Integer mood, Integer weather, String content, String nickname, String awsS3SavedFileURL) {
         this.title = title;
         this.mood = mood;
         this.weather = weather;
         this.content = content;
         this.nickname = nickname;
-        this.savedFilename = savedFilename;
+        this.awsS3SavedFileURL = awsS3SavedFileURL;
     }
 }

@@ -21,22 +21,28 @@ public class DiaryImage {
     @Column(nullable = false)
     private String savedFilename;
 
+    // 이미지에 대한 정보를 DB에서 찾을때 활용
+    @Column(nullable = false)
+    private String awsS3SavedFileURL;
+
     // 연관관계 주인
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id")
     private Diary diary;
 
     @Builder
-    public DiaryImage(String originalFilename, String savedFilename, Diary diary) {
+    public DiaryImage(String originalFilename, String savedFilename, String awsS3SavedFileURL, Diary diary) {
         this.originalFilename = originalFilename;
         this.savedFilename = savedFilename;
+        this.awsS3SavedFileURL = awsS3SavedFileURL;
         this.assignDiary(diary);
     }
 
-    public static DiaryImage createDiaryImage(String originalFilename, String savedFilename, Diary diary) {
+    public static DiaryImage createDiaryImage(String originalFilename, String savedFilename, String awsS3SavedFileURL, Diary diary) {
         return DiaryImage.builder()
                 .originalFilename(originalFilename)
                 .savedFilename(savedFilename)
+                .awsS3SavedFileURL(awsS3SavedFileURL)
                 .diary(diary)
                 .build();
     }

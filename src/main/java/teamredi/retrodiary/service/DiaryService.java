@@ -1,16 +1,19 @@
 package teamredi.retrodiary.service;
 
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.util.Pair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import teamredi.retrodiary.config.AWSS3Config;
 import teamredi.retrodiary.dto.DiaryResponseDTO;
 import teamredi.retrodiary.dto.DiaryUpdateRequestDTO;
 import teamredi.retrodiary.dto.DiaryWriteRequestDTO;
+import teamredi.retrodiary.dto.aws.FileDTO;
 import teamredi.retrodiary.entity.Diary;
 import teamredi.retrodiary.entity.DiaryImage;
 import teamredi.retrodiary.entity.Member;
@@ -20,6 +23,7 @@ import teamredi.retrodiary.repository.member.MemberRepository;
 import teamredi.retrodiary.util.DiaryUtils;
 import teamredi.retrodiary.util.FileStorageUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +39,11 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final DiaryImageRepository diaryImageRepository;
+
+    private final AWSS3Config awss3Config;
+
+    @Value("${cloud.aws.s3.bucket-name}")
+    private String bucketName;
 
 
     /**
@@ -61,14 +70,20 @@ public class DiaryService {
         try {
             if (!images.isEmpty() && !images.get(0).isEmpty()) {
                 for (MultipartFile image : images) {
-                    Pair<String, String> pair = FileStorageUtil.saveFile(image);
+                    FileDTO fileDTO = FileStorageUtil.saveFile(image);
 
-                    String originalFilename = pair.getFirst();
-                    String savedFilename = pair.getSecond();
+                    String originalFilename = fileDTO.getOriginalFilename();
+                    String savedFilename = fileDTO.getSavedFilename();
+                    File file = fileDTO.getFile();
+
+                    awss3Config.amazonS3Client().putObject(new PutObjectRequest(bucketName, savedFilename, file));
+                    String awsS3URL = awss3Config.amazonS3Client().getUrl(bucketName, savedFilename).toString();
 
                     DiaryImage diaryImage =
-                            DiaryImage.createDiaryImage(originalFilename, savedFilename, createDiary);
+                            DiaryImage.createDiaryImage(originalFilename, savedFilename, awsS3URL, createDiary);
                     createDiary.addDiaryImages(diaryImage);
+                    file.delete();
+
 
                 }
             }
@@ -77,6 +92,7 @@ public class DiaryService {
             System.err.println("Error saving images: " + e.getMessage());
             throw e; // 예외를 다시 던져 컨트롤러나 상위 레이어에서 처리할 수 있게 합니다.
         }
+
 
         diaryRepository.save(createDiary);
     }
@@ -109,7 +125,7 @@ public class DiaryService {
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
         LocalDate localDate = DiaryUtils.stringToLocalDate(date);
-        Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
+        Diary findDiary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
                 new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
 
 
@@ -117,14 +133,20 @@ public class DiaryService {
         try {
             if (images != null && !images.isEmpty()) {
                 for (MultipartFile image : images) {
-                    Pair<String, String> pair = FileStorageUtil.saveFile(image);
+                    FileDTO fileDTO = FileStorageUtil.saveFile(image);
 
-                    String originalFilename = pair.getFirst();
-                    String savedFilename = pair.getSecond();
+                    String originalFilename = fileDTO.getOriginalFilename();
+                    String savedFilename = fileDTO.getSavedFilename();
+                    File file = fileDTO.getFile();
+
+
+                    awss3Config.amazonS3Client().putObject(new PutObjectRequest(bucketName, savedFilename, file));
+                    String awsS3URL = awss3Config.amazonS3Client().getUrl(bucketName, savedFilename).toString();
 
                     DiaryImage diaryImage =
-                            DiaryImage.createDiaryImage(originalFilename, savedFilename, diary);
-                    diary.addDiaryImages(diaryImage);
+                            DiaryImage.createDiaryImage(originalFilename, savedFilename, awsS3URL, findDiary);
+                    findDiary.addDiaryImages(diaryImage);
+
 
                 }
             }
@@ -134,7 +156,7 @@ public class DiaryService {
             throw e; // 예외를 다시 던져 컨트롤러나 상위 레이어에서 처리할 수 있게 합니다.
         }
 
-        diary.updateDiary(
+        findDiary.updateDiary(
                 diaryUpdateRequestDTO.getTitle(),
                 diaryUpdateRequestDTO.getMood(),
                 diaryUpdateRequestDTO.getWeather(),
