@@ -34,7 +34,7 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
                         diary.weather,
                         diary.content,
                         member.nickname,
-                        diaryImage.savedFilename
+                        diaryImage.awsS3SavedFileURL
                 ))
                 .from(diary)
                 .join(diary.member, member)
@@ -47,12 +47,11 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
 
         DiaryResponseDAO diaryResponseDAO = content.get(0);
 
-        List<String> savedFilePaths = new ArrayList<>();
+        List<String> awsS3SavedFileURLs = new ArrayList<>();
 
-        if (diaryResponseDAO.getSavedFilename() != null) {
-            savedFilePaths = content.stream()
-                    .map(DiaryResponseDAO::getSavedFilename)
-                    .map(FileStorageUtil::getLocalStoreDir)
+        if (diaryResponseDAO.getAwsS3SavedFileURL() != null) {
+            awsS3SavedFileURLs = content.stream()
+                    .map(DiaryResponseDAO::getAwsS3SavedFileURL)
                     .toList();
         }
 
@@ -63,7 +62,7 @@ public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
                         .weather(diaryResponseDAO.getWeather())
                         .content(diaryResponseDAO.getContent())
                         .nickname(diaryResponseDAO.getNickname())
-                        .savedFilePaths(savedFilePaths)
+                        .awsS3SavedFileURLs(awsS3SavedFileURLs)
                         .build());
     }
 

@@ -1,8 +1,8 @@
 package teamredi.retrodiary.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
+import teamredi.retrodiary.dto.aws.FileDTO;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class FileStorageUtil {
         return LOCAL_STORE_DIR + filename;
     }
 
-    public static Pair<String, String> saveFile(MultipartFile file) throws IOException {
+    public static FileDTO saveFile(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
 
         // 원본 파일명 -> 서버에 저장된 파일명 (중복 X)
@@ -48,7 +48,11 @@ public class FileStorageUtil {
 
 
         // 저장된 파일의 경로를 반환합니다.
-        return Pair.of(originalFilename, savedFilename);
+        return FileDTO.builder()
+                .originalFilename(originalFilename)
+                .savedFilename(savedFilename)
+                .file(image)
+                .build();
     }
 
     // 확장자 추출
