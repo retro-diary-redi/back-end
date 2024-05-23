@@ -29,7 +29,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 //    // https://mvnrepository.com/artifact/io.awspring.cloud/spring-cloud-aws-starter
 //    implementation group: 'io.awspring.cloud', name: 'spring-cloud-aws-starter', version: '3.1.0'
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 //    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
