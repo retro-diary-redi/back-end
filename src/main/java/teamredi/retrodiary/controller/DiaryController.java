@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -199,7 +198,7 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-            diaryImageService.deleteDiaryImageFromDBAndLocalStorage(date, username);
+            diaryImageService.deleteDiaryImageFromDB(date, username);
             diaryService.updateDiary(date, diaryUpdateRequestDTO, multipartFile, username);
             responseData.put("message", "일기를 성공적으로 업데이트 했습니다.");
         } catch (Exception e) {
@@ -241,7 +240,6 @@ public class DiaryController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-            diaryImageService.deleteDiaryImageFromLocalStorage(date, username);
             diaryService.deleteDiary(date, username);
 
             responseData.put("message", "다이어리를 성공적으로 삭제 했습니다.");

@@ -138,7 +138,12 @@ public class DiaryService {
                     String savedFilename = fileDTO.getSavedFilename();
                     File file = fileDTO.getFile();
 
-
+                    // 업데이트 하려는 이미지가 이미 버킷에 존재한다면 따로 버켓 저장 요청을 보내지 않고 다음 이미지를 확인한다.
+                    // 하지만 버킷에서 파일을 서버로 가져오는 것은 요금이 많이 부과됨으로 getObject() 메서드 활용을 최대한 사용을 자제해야한다.
+                    // 그래서 doseObjectExist() 메서드를 활용하여 이미 버킷내에 해당 파일이 존재한다면 새로 저장할 필요없이 다음 루프를 실행한다.
+//                    if (awss3Config.amazonS3Client().doesObjectExist(bucketName, savedFilename)) {
+//                        continue;
+//                    }
                     awss3Config.amazonS3Client().putObject(new PutObjectRequest(bucketName, savedFilename, file));
                     String awsS3URL = awss3Config.amazonS3Client().getUrl(bucketName, savedFilename).toString();
 
@@ -175,9 +180,27 @@ public class DiaryService {
         LocalDate localDate = DiaryUtils.stringToLocalDate(date);
         boolean isExistsDiary = diaryRepository.existsDiaryByDateAndUsername(
                 localDate, username);
+
         if (isExistsDiary) {
             Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                     new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
+
+            Diary diary = diaryRepository.findDiaryByDateAndMember(localDate, member).orElseThrow(() ->
+                    new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate));
+
+            Long diaryId = diary.getId();
+            List<String> savedFilenameList = diaryImageRepository.getSavedFilenameListByDiaryId(diaryId);
+            try {
+                if (savedFilenameList != null && !savedFilenameList.isEmpty() && !savedFilenameList.get(0).isEmpty()) {
+                    for (String savedFilename : savedFilenameList) {
+                        awss3Config.amazonS3Client().deleteObject(bucketName, savedFilename);
+                    }
+                }
+            } catch (Exception e) {
+                // 파일 저장 중 예외가 발생한 경우, 로그를 남기거나 에러 처리를 수행합니다.
+                System.err.println("Error deleting images: " + e.getMessage());
+                throw e; // 예외를 다시 던져 컨트롤러나 상위 레이어에서 처리할 수 있게 합니다.
+            }
             diaryRepository.deleteDiaryByDateAndMember(localDate, member);
         } else {
             throw new NoSuchElementException("해당 날짜에 작성한 다이어리를 찾을 수 없습니다. 작성 날짜 : " + localDate);
