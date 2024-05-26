@@ -54,7 +54,6 @@ public class DiaryService {
      **/
     @Transactional
     public void saveDiary(String date, DiaryWriteRequestDTO diaryWriteRequestDto, List<MultipartFile> images, String username) throws IOException {
-        log.info("size = " + images.size());
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
 
@@ -68,7 +67,7 @@ public class DiaryService {
                 );
 
         try {
-            if (!images.isEmpty() && !images.get(0).isEmpty()) {
+            if (images != null && !images.isEmpty() && !images.get(0).isEmpty()) {
                 for (MultipartFile image : images) {
                     FileDTO fileDTO = FileStorageUtil.saveFile(image);
 
@@ -131,7 +130,7 @@ public class DiaryService {
 
 
         try {
-            if (images != null && !images.isEmpty()) {
+            if (images != null && !images.isEmpty() && !images.get(0).isEmpty()) {
                 for (MultipartFile image : images) {
                     FileDTO fileDTO = FileStorageUtil.saveFile(image);
 
@@ -147,6 +146,7 @@ public class DiaryService {
                             DiaryImage.createDiaryImage(originalFilename, savedFilename, awsS3URL, findDiary);
                     findDiary.addDiaryImages(diaryImage);
 
+                    file.delete();
 
                 }
             }
